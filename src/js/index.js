@@ -36,3 +36,8 @@ elements.searchForm.addEventListener('submit', e => {
     controlSearch();
 });
 
+elements.pagesLinks.addEventListener('click', e => {
+    const btn = e.target.closest('.btn-inline');
+    console.log(btn);
+});
+
