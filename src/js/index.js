@@ -1,14 +1,18 @@
 import Search from './models/Search';
 import Recipe from './models/Recipe';
 import * as searchView from './views/searchView';
-import { elements, renderLoader, clearLoader } from './views/base';
+import {
+    elements,
+    renderLoader,
+    clearLoader
+} from './views/base';
 /**
  * Global state
  *  - Search Object
  *  - Current recipe object
  *  - Shopping List object
  *  - Liked Recipes
- */ 
+ */
 const state = {};
 
 // SEARCH CONTROLLER 
@@ -17,19 +21,26 @@ const controlSearch = async () => {
     const query = searchView.getInput();
     console.log(query);
 
-    if(query) {
+    if (query) {
         // 2. New search object and add to state~
         state.search = new Search(query);
         // 3. Prepare UI for results
         searchView.clearInput();
         searchView.clearResults();
         renderLoader(elements.searchResults);
-        // 4. Search for recipes
-        await state.search.getResults();
 
-        // 5. Render results on UI
-        clearLoader();
-        searchView.renderResults(state.search.result);
+
+        try {
+            // 4. Search for recipes
+            await state.search.getResults();
+
+            // 5. Render results on UI
+            clearLoader();
+            searchView.renderResults(state.search.result);
+        } catch (err) {
+            alert('Something went wrong with the search.')
+        }
+
     }
 }
 
@@ -40,7 +51,7 @@ elements.searchForm.addEventListener('submit', e => {
 
 elements.pagesLinks.addEventListener('click', e => {
     const btn = e.target.closest('.btn-inline');
-    if(btn) {
+    if (btn) {
         const goToPage = parseInt(btn.dataset.goto, 10);
         searchView.clearResults();
         searchView.renderResults(state.search.result, goToPage);
@@ -49,8 +60,34 @@ elements.pagesLinks.addEventListener('click', e => {
 });
 
 
-//RECIPE CONTROLLER
-const r = new Recipe(46956);
-r.getRecipe();
-console.log(r);
 
+//RECIPE CONTROLLER
+const controlRecipe = async () => {
+    const id = window.location.hash.replace('#', '');
+    console.log(id);
+
+    if (id) {
+        // Prepare UI for changes
+
+        // Create new recipe object
+        state.recipe = new Recipe(id);
+        window.r = state.recipe;
+
+        try {
+            // Get recipe data
+            await state.recipe.getRecipe();
+            // Calc servings and time
+            state.recipe.calcTime();
+            state.recipe.calcServings();
+            // Render the recipe
+            console.log(state.recipe);
+        } catch (err) {
+            alert('Error processing recipe');
+        }
+    }
+};
+
+// window.addEventListener('hashchange', controlRecipe);
+// window.addEventListener('load', controlRecipe);
+
+['hashchange', 'load'].forEach(event => window.addEventListener(event, controlRecipe));
