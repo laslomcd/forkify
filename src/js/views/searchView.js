@@ -9,6 +9,15 @@ export const clearResults = () => {
     elements.pagesLinks.innerHTML = '';
 }
 
+export const highlightSelected = id => {
+    const resultsArr = Array.from(document.querySelector('.results__link'));
+    resultsArr.forEach(el => {
+        el.classList.remove('results__link--active')
+    });
+    document.querySelector(`a[href="#${id}"]`).classList.add('results__link--active');
+}
+
+
 const limitRecipeTitle = (title, limit = 17) => {
     const newTitle = [];
     if(title.length > limit) {
